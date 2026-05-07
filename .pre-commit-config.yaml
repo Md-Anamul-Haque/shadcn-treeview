@@ -27,3 +27,10 @@ repos:
         language: system
         pass_filenames: false
         types_or: [ts, tsx]
+
+      - id: build-registry
+        name: build registry
+        entry: mise run registry:build
+        language: system
+        pass_filenames: false
+        types_or: [javascript, jsx, ts, tsx]
