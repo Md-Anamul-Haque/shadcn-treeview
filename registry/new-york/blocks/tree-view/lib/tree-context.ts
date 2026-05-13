@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { TreeNodeData, FlatTreeNode, DropPosition } from "@/registry/new-york/blocks/tree-view/lib/tree-types";
+import type { TreeNodeData, FlatTreeNode, DropPosition, TreeNodeRenderProps } from "@/registry/new-york/blocks/tree-view/lib/tree-types";
 
 /**
  * Internal context for a single TreeView instance.
@@ -33,10 +33,10 @@ export interface TreeViewContextValue<T extends TreeNodeData = TreeNodeData> {
   selectRange: (id: string) => void;
   setFocused: (id: string | null) => void;
   renderNode: (
-    props: import("./tree-types").TreeNodeRenderProps<T>,
+    props: TreeNodeRenderProps<T>,
   ) => React.ReactNode;
   renderDragOverlay?: (
-    props: import("./tree-types").TreeNodeRenderProps<T>,
+    props: TreeNodeRenderProps<T>,
   ) => React.ReactNode;
 }
 
