@@ -190,10 +190,11 @@ export function TreeNodeRow<T extends TreeNodeData = TreeNodeData>({
         toggle: () => toggleExpand(node.id),
         select: handleSelect,
       })}
-      {isDropTargetNode && currentDropPosition === "after" && (
+      {isDropTargetNode && currentDropPosition && (
         <TreeDropIndicator
           depth={indicatorDepth}
           indentationWidth={indentationWidth}
+          currentDropPosition={currentDropPosition}
         />
       )}
     </div>

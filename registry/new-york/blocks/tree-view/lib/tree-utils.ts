@@ -190,13 +190,17 @@ export function getProjection<T extends TreeNodeData>(
   const projectedDepth = Math.max(0, baseDepth + depthDelta);
 
   // Clamp the projected depth based on surrounding nodes
-  const nextNode = visibleNodes[overIndex + 1];
-  const maxDepth = overNode.isGroup
-    ? overNode.depth + 1
-    : overNode.depth;
-  const minDepth = nextNode ? nextNode.depth : 0;
-  const clampedDepth = Math.min(Math.max(projectedDepth, minDepth), maxDepth);
+  // const nextNode = visibleNodes[overIndex + 1];
+  // const maxDepth = overNode.isGroup
+  //   ? overNode.depth + 1
+  //   : overNode.depth;
+  // const minDepth = nextNode ? nextNode.depth : 0;
+  // const clampedDepth = Math.min(Math.max(projectedDepth, minDepth), maxDepth);
 
+  // Clamp the projected depth based on surrounding nodes
+  const maxDepth = overNode.isGroup ? overNode.depth + 1 : overNode.depth
+  const clampedDepth = Math.min(Math.max(projectedDepth, 0), maxDepth)
+  
   // Find the parent at the projected depth
   let parentId: string | null = null;
   if (clampedDepth > 0) {

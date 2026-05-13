@@ -35,7 +35,9 @@ export interface UseTreeDndOptions<T extends TreeNodeData> {
   onDragEnd?: (event: TreeDragEvent<T>) => MaybePromise<void>;
   expandOnDragHover?: boolean;
   expandOnDragHoverDelay?: number;
+  collapseOnDragStart?: boolean;
   expand: (id: string) => void;
+  collapse: (id: string) => void;
 }
 
 export interface UseTreeDndReturn {
@@ -66,7 +68,9 @@ export function useTreeDnd<T extends TreeNodeData>(
     onDragEnd,
     expandOnDragHover = true,
     expandOnDragHoverDelay = 500,
+    collapseOnDragStart = false,
     expand,
+    collapse,
   } = options;
 
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -86,6 +90,8 @@ export function useTreeDnd<T extends TreeNodeData>(
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const hoverTargetRef = useRef<string | null>(null);
   const offsetRef = useRef({ x: 0, y: 0 });
+  const originalExpandedRef = useRef<Set<string> | null>(null);
+
 
   const handleDragStart: DragStartEvent = useCallback(
     (event) => {
@@ -97,6 +103,12 @@ export function useTreeDnd<T extends TreeNodeData>(
 
       setActiveId(String(source.id));
       offsetRef.current = { x: 0, y: 0 };
+      
+      // add this block
+      if (collapseOnDragStart && sourceNode.isGroup && expandedIds.has(sourceNode.id)) {
+        originalExpandedRef.current = new Set(expandedIds);
+        collapse(sourceNode.id);
+      }
 
       if (onDragStart && sourceNode) {
         onDragStart({
@@ -109,7 +121,7 @@ export function useTreeDnd<T extends TreeNodeData>(
         });
       }
     },
-    [flatNodes, treeId, onDragStart]
+    [flatNodes, treeId, onDragStart, collapseOnDragStart, expandedIds, collapse]
   );
 
   const handleDragOver: DragOverEvent = useCallback(
@@ -183,7 +195,9 @@ export function useTreeDnd<T extends TreeNodeData>(
           targetNode.isGroup &&
           (projection.parentId === targetId || isExpandedEmptyGroup)
             ? "inside"
-            : "after";
+            : offsetRef.current.y < 0
+              ? "before"
+              : "after"; //"after";
 
         if (isExpandedEmptyGroup && position === "inside") {
           const correctedDepth = targetNode.depth + 1;
@@ -356,8 +370,10 @@ export function useTreeDnd<T extends TreeNodeData>(
         );
         if (targetFlatIdx >= 0) {
           if (currentDropPosition === "inside") {
-            // Insert as first child of the target (right after the target node)
             insertAt = targetFlatIdx + 1;
+          } else if (currentDropPosition === "before") {
+            // Insert before the target node
+            insertAt = targetFlatIdx;
           } else {
             // "after" — insert after the target and all its descendants
             let i = targetFlatIdx + 1;
@@ -383,7 +399,15 @@ export function useTreeDnd<T extends TreeNodeData>(
       if (onDragEnd) {
         onDragEnd(dragEvent);
       }
-
+      
+      // Restore original expanded state if drag was successful
+      if (originalExpandedRef.current && !canceled) {
+        for (const id of originalExpandedRef.current) {
+          expand(id);
+        }
+      }
+      originalExpandedRef.current = null;
+      
       resetState();
     },
     [

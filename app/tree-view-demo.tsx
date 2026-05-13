@@ -475,7 +475,11 @@ export function TreeViewDemo() {
     <TreeViewDndContext onDragEnd={handleCrossTreeDragEnd}>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <h3 className="mb-2 text-sm font-medium">Tree A</h3>
+          <h3 className="mb-2 text-sm font-medium">Tree A
+            <span className="ml-2 inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
+                with collapseOnDragStart
+            </span>
+          </h3>
           <div className="rounded-md border p-2">
             <TreeView<DemoItem>
               treeId="tree-a"
@@ -490,6 +494,7 @@ export function TreeViewDemo() {
               dndGroup={SHARED_DND_GROUP}
               indentationWidth={INDENT_WIDTH}
               aria-label="Tree A"
+              collapseOnDragStart
             />
           </div>
         </div>

@@ -110,6 +110,8 @@ export interface TreeViewProps<
   expandOnDragHoverDelay?: number;
   /** Pixels per indent level */
   indentationWidth?: number;
+  /** Collapse expanded folder on drag start (default: false) */
+  collapseOnDragStart?: boolean;
   /**
    * Horizontal offset (in px) from the left edge of each indentation column
    * to the guide line. The guide line for depth `d` is positioned at
@@ -156,6 +158,7 @@ export function TreeView<T extends TreeNodeData = TreeNodeData>({
   expandOnDragHover = true,
   expandOnDragHoverDelay = 500,
   indentationWidth = 20,
+  collapseOnDragStart = false,
   guideLineOffset = 16,
   showGuideLines = true,
   dndGroup: dndGroupProp,
@@ -207,7 +210,9 @@ export function TreeView<T extends TreeNodeData = TreeNodeData>({
     onDragEnd,
     expandOnDragHover,
     expandOnDragHoverDelay,
+    collapseOnDragStart,
     expand: state.expand,
+    collapse: state.collapse,
   });
 
   // Register with group context for cross-tree DND event dispatch
