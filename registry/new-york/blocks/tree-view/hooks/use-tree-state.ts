@@ -260,32 +260,31 @@ export function useTreeState<T extends TreeNodeData>(
     []
   );
 
+  
+  const itemsRef = useRef(items)
+  itemsRef.current = items
+
   const insertChildren = useCallback(
     (parentId: string, children: TreeNodeNested<T>[]) => {
-      // Rebuild items with children inserted under the parent
-      function insertInto(
-        nodes: TreeNodeNested<T>[]
-      ): TreeNodeNested<T>[] {
+      function insertInto(nodes: TreeNodeNested<T>[]): TreeNodeNested<T>[] {
         return nodes.map((node) => {
           if (node.id === parentId) {
             return {
               ...node,
               children: [...(node.children ?? []), ...children],
-            };
+            }
           }
           if (node.children) {
-            return { ...node, children: insertInto(node.children) };
+            return { ...node, children: insertInto(node.children) }
           }
-          return node;
-        });
+          return node
+        })
       }
-
-      if (onItemsChangeRef.current) {
-        onItemsChangeRef.current(insertInto(items));
-      }
+      onItemsChangeRef.current?.(insertInto(itemsRef.current))
     },
-    [items]
-  );
+    []
+  )
+
 
   return {
     flatNodes,
